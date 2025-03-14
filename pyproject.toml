@@ -1,0 +1,22 @@
+[project]
+name = "xpln"
+version = "0.1.0"
+description = "xpln is a CLI tool that explains terminal commands for you before you run them"
+authors = [
+    {name = "Eddie Gikundi",email = "eddiemwiti10@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "typer (>=0.15.2,<0.16.0)"
+]
+
+[tool.poetry]
+packages = [{include = "xpln", from = "src"}]
+
+[tool.poetry.scripts]
+xpln = "xpln.cli:app"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
