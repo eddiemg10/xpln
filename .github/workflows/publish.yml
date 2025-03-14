@@ -31,16 +31,16 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Get commit message
-        id: get_commit_message
-        run: echo "COMMIT_MESSAGE=$(git log -1 --pretty=%B)" >> $GITHUB_ENV
+      - name: Get commit title
+        id: get_commit_title
+        run: echo "COMMIT_TITLE=$(git log -1 --pretty=%s)" >> $GITHUB_ENV
 
       - name: Determine version bump type
         id: determine_bump
         run: |
-          if echo "$COMMIT_MESSAGE" | grep -iq "#major"; then
+          if echo "$COMMIT_TITLE" | grep -iq "#major"; then
             echo "BUMP_TYPE=major" >> $GITHUB_ENV
-          elif echo "$COMMIT_MESSAGE" | grep -iq "#minor"; then
+          elif echo "$COMMIT_TITLE" | grep -iq "#minor"; then
             echo "BUMP_TYPE=minor" >> $GITHUB_ENV
           else
             echo "BUMP_TYPE=patch" >> $GITHUB_ENV
