@@ -54,7 +54,7 @@ jobs:
         run: |
           poetry version $BUMP_TYPE
           echo "NEW_VERSION=$(poetry version -s)" >> $GITHUB_ENV
-          echo "new_version=$(poetry version -s)" >> $GITHUB_ENV
+          echo "new_version=$(poetry version -s)" >> $GITHUB_OUTPUT
 
       - name: Commit updated version
         run: |

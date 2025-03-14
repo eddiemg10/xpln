@@ -1,6 +1,6 @@
 [project]
 name = "xpln"
-version = "0.1.1"
+version = "0.1.0"
 description = "xpln is a CLI tool that explains terminal commands for you before you run them"
 authors = [
     {name = "Eddie Gikundi",email = "eddiemwiti10@gmail.com"}
