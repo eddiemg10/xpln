@@ -98,3 +98,5 @@ def this(
         # TODO: Call the API to get the explanation
     # print(f"\n🔍 Explaining: {full_command}")
     print("\n📖 Explanation: Sit tight as we work on making this work.")
+
+
