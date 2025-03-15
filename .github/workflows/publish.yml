@@ -1,0 +1,104 @@
+name: Auto Version & Publish
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+jobs:
+  versioning:
+    name: Bump Version & Tag Release
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.bump_version.outputs.new_version }}
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+      
+      - name: Check for version bump commit and ignore it
+        run: |
+          if git log -1 --pretty=%s | grep -F "[automated versioning]"; then
+            echo "Skipping version bump to prevent loop."
+            exit 1
+          fi
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Get commit title
+        id: get_commit_title
+        run: echo "COMMIT_TITLE=$(git log -1 --pretty=%s)" >> $GITHUB_ENV
+
+      - name: Determine version bump type
+        id: determine_bump
+        run: |
+          if echo "$COMMIT_TITLE" | grep -iq "#major"; then
+            echo "BUMP_TYPE=major" >> $GITHUB_ENV
+          elif echo "$COMMIT_TITLE" | grep -iq "#minor"; then
+            echo "BUMP_TYPE=minor" >> $GITHUB_ENV
+          else
+            echo "BUMP_TYPE=patch" >> $GITHUB_ENV
+          fi
+
+      - name: Get current version
+        run: echo "CURRENT_VERSION=$(poetry version -s)" >> $GITHUB_ENV
+
+      - name: Bump version
+        id: bump_version
+        run: |
+          poetry version $BUMP_TYPE
+          echo "NEW_VERSION=$(poetry version -s)" >> $GITHUB_ENV
+          echo "new_version=$(poetry version -s)" >> $GITHUB_OUTPUT
+
+      - name: Commit updated version
+        run: |
+          git add pyproject.toml
+          git commit -m "[automated versioning] chore: bump version to $NEW_VERSION" || exit 0
+          git push origin main
+
+      - name: Create & push Git tag
+        run: |
+          git tag v$NEW_VERSION
+          git push origin v$NEW_VERSION
+
+  publish:
+    name: Build & Publish to PyPI
+    runs-on: ubuntu-latest
+    needs: versioning
+    if: needs.versioning.outputs.new_version != ''
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Configure Poetry
+        run: poetry config pypi-token.pypi ${{ secrets.PYPI_API_TOKEN }}
+
+      - name: Build package
+        run: poetry build
+
+      - name: Publish to PyPI
+        run: poetry publish
