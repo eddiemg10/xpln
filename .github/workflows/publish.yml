@@ -22,20 +22,9 @@ jobs:
       
       - name: Check for version bump commit and ignore it
         run: |
-          COMMIT_MESSAGE=$(git log -1 --pretty=%B)
-          COMMIT_TITLE=$(git log -1 --pretty=%s)
-          echo "Commit Message: $COMMIT_MESSAGE"
-          echo "Commit Title: $COMMIT_TITLE"
-          if git log -1 --pretty=%B | grep -q "[automated versioning]"; then
+          if git log -1 --pretty=%s | grep -F "[automated versioning]"; then
             echo "Skipping version bump to prevent loop."
             exit 1
-          fi
-
-      - name: Check for version bump commit and ignore it
-        run: |
-          if git log -1 --pretty=%B | grep -q "[automated versioning]"; then
-            echo "Skipping version bump to prevent loop."
-            exit 0
           fi
 
       - name: Set up Python
