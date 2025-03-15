@@ -13,17 +13,18 @@ jobs:
       new_version: ${{ steps.bump_version.outputs.new_version }}
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+      
       - name: Check for version bump commit and ignore it
         run: |
           if git log -1 --pretty=%B | grep -q "[automated versioning]"; then
             echo "Skipping version bump to prevent loop."
             exit 0
           fi
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.PAT_TOKEN }}
-      
+
       - name: Check for version bump commit and ignore it
         run: |
           if git log -1 --pretty=%B | grep -q "[automated versioning]"; then
