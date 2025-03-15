@@ -23,6 +23,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.PAT_TOKEN }}
+      
+      - name: Check for version bump commit and ignore it
+        run: |
+          if git log -1 --pretty=%B | grep -q "[automated versioning]"; then
+            echo "Skipping version bump to prevent loop."
+            exit 0
+          fi
 
       - name: Set up Python
         uses: actions/setup-python@v5
