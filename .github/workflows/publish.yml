@@ -13,6 +13,12 @@ jobs:
       new_version: ${{ steps.bump_version.outputs.new_version }}
 
     steps:
+      - name: Check for version bump commit and ignore it
+        run: |
+          if git log -1 --pretty=%B | grep -q "[automated versioning]"; then
+            echo "Skipping version bump to prevent loop."
+            exit 0
+          fi
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -59,7 +65,7 @@ jobs:
       - name: Commit updated version
         run: |
           git add pyproject.toml
-          git commit -m "chore: bump version to $NEW_VERSION"
+          git commit -m "[automated versioning] chore: bump version to $NEW_VERSION" || exit 0
           git push origin main
 
       - name: Create & push Git tag
