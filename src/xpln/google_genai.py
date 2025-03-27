@@ -48,6 +48,8 @@ def initializeClient(api_key: str):
         return CLIENT
     try:
         CLIENT = genai.Client(api_key=api_key)
+         # Force a validation request to check if the API key is valid
+        CLIENT.models.list()  
         return CLIENT
     except Exception:
         print(Panel("❌ [red1]Could not initialize Google Cloud AI agent with the provided API Key.[/]\nRun xpln init --update to update the API Key.", expand=False))
@@ -59,15 +61,19 @@ def getXplnation(command: str):
     global CLIENT
     global SYSTEM_INSTRUCTION
 
-    response = CLIENT.models.generate_content(
-        model="gemini-2.0-flash",
-        config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_INSTRUCTION,
-            temperature=0.2,  # Lower = more deterministic, precise answers.
-            max_output_tokens=250,  # Keeps the response short and structured.
-            top_p=0.9,  # Encourages diverse but reasonable word choices.
-            frequency_penalty=0.3,  # Prevents repetitive explanations.
-        ),
-        contents=f"\n\nThe Command to explain: {command}",
-    )
+    try:
+        response = CLIENT.models.generate_content(
+            model="gemini-2.0-flash",
+            config=types.GenerateContentConfig(
+                system_instruction=SYSTEM_INSTRUCTION,
+                temperature=0.2,  # Lower = more deterministic, precise answers.
+                max_output_tokens=250,  # Keeps the response short and structured.
+                top_p=0.9,  # Encourages diverse but reasonable word choices.
+                frequency_penalty=0.3,  # Prevents repetitive explanations.
+            ),
+            contents=f"\n\nThe Command to explain: {command}",
+        )
+    except Exception:
+        print(Panel("❌ [red1]Could not reach Google Cloud AI agent This is likely an API Key issue.[/]\nRun xpln init --update to update the API Key.", expand=False))
+        raise typer.Exit()
     return response.text
