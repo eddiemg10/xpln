@@ -6,10 +6,13 @@ import typer
 import click
 from typing_extensions import Annotated
 from rich import print  
+from rich.panel import Panel  
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from pathlib import Path
 
-from xpln.utils import loadApiKey, saveApiKey, showLandingPage
+from xpln.decorators import require_api_key
+from xpln.utils import loadApiKey, printExplanationPanel, saveApiKey, showLandingPage
+from xpln.google_genai import getXplnation, initializeClient
 from . import __app_name__, __version__, FILE_ERROR, NO_COMMAND_ERROR, ERRORS
 
 app = typer.Typer()
@@ -58,7 +61,8 @@ def init(
         print("Error reading config file")
         raise typer.Abort()
     elif ApiKeyResponse is not None and not update:
-        print("[green1]xpln has already been initialized with an API Key :white_heavy_check_mark:")
+        print("[green1]xpln has already been initialized with an API Key :white_heavy_check_mark:[/]")
+        print(Panel("Run xpln init --update to update the API Key.", expand=False))
         raise typer.Exit()
     else:
         if not api_key:
@@ -67,7 +71,9 @@ def init(
         saveApiKey(api_key) 
         print(f"[green1]API Key {api_key} has been {'saved' if not update else 'updated'} successfully :white_heavy_check_mark:")
 
-@app.command()
+
+@app.command(context_settings={"ignore_unknown_options": True})
+@require_api_key
 def this(
     command: List[str] = typer.Argument(
         None,
@@ -93,10 +99,10 @@ def this(
         TextColumn("[progress.description]{task.description}"),
         transient=True,
     ) as progress:
-        progress.add_task(description=(f"🔍 Explaining: {full_command}"), total=None)
-        time.sleep(3)
-        # TODO: Call the API to get the explanation
-    # print(f"\n🔍 Explaining: {full_command}")
-    print("\n📖 Explanation: Sit tight as we work on making this work.")
+        task = progress.add_task(description=(f"🔍 Processing..."), total=None)
+        initializeClient(loadApiKey())
+        explanation = getXplnation(full_command)
+        progress.stop()
+        printExplanationPanel(explanation)
 
 
