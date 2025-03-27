@@ -17,9 +17,29 @@ At this point, `xpln` should be globally accessible from the terminal!
 Run `xpln` on the terminal to begin, or `xpln --help` to get the available commands
 ![image](https://github.com/user-attachments/assets/14c04108-624d-487d-beec-9ad3eae79863)
 
+`xpln` is powered by Google AI Studio and requires an an [API Key](https://aistudio.google.com/apikey) to initialize.
+Once you have an API Key, this can be initialized by running `xpln init` and following the instructions.
+
+Alternatively, an API Key can be directly specified by including the `--key / -k` option
+```sh
+xpln init --key <API KEY>
+```
+```sh
+xpln init --update --key <UPDATED API KEY>
+```
+Once initialized, use the `this` command to get explanations of different commands
+```sh
+xpln this <COMMAND>
+```
 ### Example Usage
+There are 2 ways of using `xpln`:
+1. Directly pasting commands into `xpln this`
 ```sh
 xpln this ls -al
+```
+2. Piping the input into `xpln this`
+```
+cat script.sh | xpln this
 ```
 
 ## ⚙️ Technical Details
