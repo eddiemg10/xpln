@@ -34,7 +34,6 @@ def main(
     )
 ) -> None:
     ctx = click.get_current_context()
-    hasPipedInput = not sys.stdin.isatty()
 
     if ctx.invoked_subcommand is None:  # ✅ Only run if no subcommand was provided
        showLandingPage()
