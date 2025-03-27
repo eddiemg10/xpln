@@ -19,6 +19,7 @@ Run `xpln` on the terminal to begin, or `xpln --help` to get the available comma
 
 `xpln` is powered by Google AI Studio and requires an an [API Key](https://aistudio.google.com/apikey) to initialize.
 Once you have an API Key, initialize the CLI by running `xpln init` and following the instructions.
+This key can be updated at any time by running `xpln init` with the  `--update / -u` option
 
 Alternatively, an API Key can be directly specified by including the `--key / -k` option
 ```sh
