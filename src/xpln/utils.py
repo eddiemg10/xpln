@@ -2,6 +2,7 @@ from . import CONFIG_DIR, CONFIG_PATH, FILE_ERROR, API_KEY
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
+import json
 
 def loadApiKey():
     """Load API key from the config file and cache it."""
@@ -56,3 +57,30 @@ def showLandingPage():
     )
 
     console.print(panel)
+
+def cleanJson(response_text: str) -> str:
+    """Removes code block formatting (e.g., ```json ... ```) from the response."""
+    return response_text.strip("```json").strip("```").strip()
+
+def printExplanationPanel(explanation: str):
+    console = Console()
+    try:
+        # ✅ Attempt to parse JSON
+        data = json.loads(cleanJson(explanation))
+
+        # 🔹 Iterate and print each key-value pair
+        output = ""
+        for key, value in data.items():
+            # Special case for caution: Add ⚠️ emoji if present
+            if key == "caution":
+                output += f"\n[orange_red1]⚠️ {key.capitalize()}: {value} [/]\n"
+                continue
+            
+            output += f"[cyan]🔹 {key.capitalize()}:[/] {value}\n"
+
+        # 📌 Wrap everything in a rich panel
+        console.print(Panel(output.strip(), border_style="magenta2"))
+
+    except json.JSONDecodeError:
+        # 🚨 If JSON parsing fails, print as-is (for non-commands)
+        console.print(Panel(explanation, border_style="yellow"))
