@@ -37,10 +37,14 @@ There are 2 ways of using `xpln`:
 ```sh
 xpln this ls -al
 ```
+![image](https://github.com/user-attachments/assets/06f13f54-33d3-4b5d-a145-0c1f6b776731)
+
 2. Piping the input into `xpln this`
 ```
 cat script.sh | xpln this
 ```
+![image](https://github.com/user-attachments/assets/95441a13-5234-46f8-b3d7-c4d3783e3ada)
+
 
 ## ⚙️ Technical Details
 ### Tools Used
